@@ -30,7 +30,7 @@ def get_youtube_source():
     vid = request.args.get('vid')
     if term:
         #url = ytube.get_top_aurl(ytube.url_by_term(term)[0])
-        title, url, duration, *_ = fetch_meta(url_by_term(keyword))
+        title, url, duration, *_ = fetch_meta(url_by_term(term))
     if vid:
         title, url, duration, *_ = fetch_meta('https://www.youtube.com/watch?v=' + vid)
     return jsonify(shorten_url(url))
