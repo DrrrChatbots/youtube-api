@@ -19,7 +19,7 @@ import youtube_dl
 
 def shorten_url(url):
     data = { "url": url }
-    tinyURL = 'https://tinyurl.com/api-create.php?url=' + url
+    tinyURL = 'https://tinyurl.com/api-create.php'
     req = request.Request(
             "{}?{}".format(tinyURL,urlencode(data, quote_via=quote_plus)),
             headers={
@@ -102,7 +102,7 @@ def fetch_meta(url, vid=False):
     
     return logger.data
 
-def urls_by_url(url, classname):
+def urls_by_url(url, classname, retry=True):
     print("search url is:", url)
     response = urllib.request.urlopen(url)
     html = response.read()
@@ -111,6 +111,7 @@ def urls_by_url(url, classname):
             for vid in soup.findAll('a', href=True, attrs={'class': classname})
             if not vid['href'].startswith("https://")]
     if rtn: return rtn
+    elif retry: urls_by_url(url, classname, False)
     else: raise Exception("No song found by the keyword QwQ")
 
 def url_by_list_id(list_id):
