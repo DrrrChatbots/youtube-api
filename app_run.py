@@ -44,7 +44,7 @@ def get_yt_source():
             'songs': [{
                 'name': title,
                 'link': url
-            } for title, url, duration in [fetch_meta(u) for u in urls_by_term(keyword)[:10]]]
+            } for title, url, duration in [fetch_meta(u) for u in urls_by_term(term)[:10]]]
         }
     if vid:
         title, url, duration = fetch_meta('https://www.youtube.com/watch?v=' + vid)
