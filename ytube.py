@@ -72,8 +72,8 @@ class Logger(object):
                 msg.startswith('[youtube'),
                 msg.startswith('[info')]):
             self.data.append(msg)
-        elif '[download] Downloading playlist:' in msg:
-            YouTubePlugin.playListName = msg[len('[download] Downloading playlist: '):]
+        #elif '[download] Downloading playlist:' in msg:
+        #    YouTubePlugin.playListName = msg[len('[download] Downloading playlist: '):]
     def warning(self, msg):
         pass
     def error(self, msg):
