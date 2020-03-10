@@ -141,13 +141,11 @@ if __name__ == '__main__':
     term = sys.argv[1]
     urls = urls_by_term(term)
     urls = [u for u in urls if 'list' not in u]
-    urls = urls[:5]
-    print(urls)
     data = {
             'songs': [{
                 'name': title,
                 'link': url
-            } for title, url, duration in [fetch_meta(u) for u in urls]]
+            } for title, url, duration in [fetch_meta(u) for u in urls[:5]]]
         }
     print(data)
 
