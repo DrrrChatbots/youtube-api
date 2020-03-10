@@ -41,7 +41,7 @@ def get_yt_source():
     term = request.args.get('term')
     vid = request.args.get('vid')
     if term:
-        urls = [u for u in url_by_term(term) if 'list' not in u]
+        urls = [u for u in urls_by_term(term) if 'list' not in u]
         print(urls)
         data = {
             'songs': [{
