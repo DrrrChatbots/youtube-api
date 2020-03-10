@@ -30,7 +30,8 @@ def get_youtube_source():
     vid = request.args.get('vid')
     if term:
         #url = ytube.get_top_aurl(ytube.url_by_term(term)[0])
-        title, url, duration, *_ = fetch_meta(url_by_term(term))
+        urls = [u for u in url_by_term(term) if 'list' not in u]
+        title, url, duration, *_ = fetch_meta(urls)
     if vid:
         title, url, duration, *_ = fetch_meta('https://www.youtube.com/watch?v=' + vid)
     return jsonify(shorten_url(url))
@@ -40,11 +41,12 @@ def get_yt_source():
     term = request.args.get('term')
     vid = request.args.get('vid')
     if term:
+        urls = [u for u in url_by_term(term) if 'list' not in u]
         data = {
             'songs': [{
                 'name': title,
                 'link': url
-            } for title, url, duration in [fetch_meta(u) for u in urls_by_term(term)[:10]]]
+            } for title, url, duration in [fetch_meta(u) for u in urls[:10]]]
         }
     if vid:
         title, url, duration = fetch_meta('https://www.youtube.com/watch?v=' + vid)

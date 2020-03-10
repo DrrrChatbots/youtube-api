@@ -1,4 +1,4 @@
-import os
+import os, sys
 import os.path
 import shlex
 import subprocess
@@ -138,5 +138,16 @@ def next_url(url):
     return rtn[0]
 
 if __name__ == '__main__':
-    print([fetch_meta(u) for u in urls_by_term('魚')[:10]])
+    term = sys.argv[1]
+    urls = urls_by_term(term)
+    urls = [u for u in urls if 'list' not in u]
+    urls = urls[:5]
+    print(urls)
+    data = {
+            'songs': [{
+                'name': title,
+                'link': url
+            } for title, url, duration in [fetch_meta(u) for u in urls]]
+        }
+    print(data)
 
