@@ -41,13 +41,13 @@ def get_yt_source():
     term = request.args.get('term')
     vid = request.args.get('vid')
     if term:
-        urls = [u for u in urls_by_term(term) if 'list' not in u]
+        urls = [u for u in urls_by_term(term) if 'list' not in u][:5]
         print(urls)
         data = {
             'songs': [{
                 'name': title,
                 'link': url
-            } for title, url, duration in [fetch_meta(u) for u in urls[:10]]]
+            } for title, url, duration in [fetch_meta(u) for u in urls]]
         }
     if vid:
         title, url, duration = fetch_meta('https://www.youtube.com/watch?v=' + vid)
