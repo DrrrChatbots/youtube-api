@@ -36,6 +36,13 @@ def get_youtube_source():
         title, url, duration, *_ = fetch_meta('https://www.youtube.com/watch?v=' + vid)
     return jsonify(shorten_url(url))
 
+def groupby(c, xss):
+    rtn = []
+    while xss:
+        rtn.append(xss[:c])
+        xss = xss[c:]
+    return rtn
+
 @app.route("/yt", methods=['GET'])
 def get_yt_source():
     term = request.args.get('term')
@@ -44,7 +51,10 @@ def get_yt_source():
         urls = [u for u in urls_by_term(term) if 'list' not in u][:5]
         print(urls)
         try:
-            metas = [fetch_meta(u) for u in urls]
+            tmp = [fetch_meta(u) for u in urls]
+            metas = []
+            for s in tmp:
+                metas = metas + groupby(3, s) 
             data = {
                 'songs': [{
                     'name': title,
@@ -55,7 +65,7 @@ def get_yt_source():
             print(metas)
             raise e
     if vid:
-        title, url, duration = fetch_meta('https://www.youtube.com/watch?v=' + vid)
+        title, url, duration, *_ = fetch_meta('https://www.youtube.com/watch?v=' + vid)
         data = {'songs': [{'name': title, 'link': url}]}
 
     return Response(json.dumps(data), mimetype='application/json')
