@@ -59,7 +59,7 @@ def get_yt_source():
                 'songs': [{
                     'name': title,
                     'link': url
-                } for title, url, duration in metas]
+                } for title, url, duration in metas[:10]]
             }
         except Exception as e:
             print(metas)
