@@ -64,10 +64,6 @@ def get_yt_source():
         except Exception as e:
             print(metas)
             raise e
-    if vid:
-        title, url, duration, *_ = fetch_meta('https://www.youtube.com/watch?v=' + vid)
-        data = {'songs': [{'name': title, 'link': url}]}
-
     return Response(json.dumps(data), mimetype='application/json')
 
 @app.route("/kw", methods=['GET'])
