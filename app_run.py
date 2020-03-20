@@ -2,7 +2,7 @@ import os, sys, re, json, time
 from functools import wraps
 from flask import Flask, request, abort, jsonify, Response
 
-from ytube import fetch_meta, url_by_term, shorten_url, urls_by_term
+from ytube import fetch_meta, url_by_term, shorten_url, urls_by_term, infos_by_term
 
 app = Flask(__name__)
 
@@ -68,6 +68,28 @@ def get_yt_source():
         title, url, duration, *_ = fetch_meta('https://www.youtube.com/watch?v=' + vid)
         data = {'songs': [{'name': title, 'link': url}]}
 
+    return Response(json.dumps(data), mimetype='application/json')
+
+@app.route("/kw", methods=['GET'])
+def get_kw_source():
+    term = request.args.get('term')
+    data = {}
+    if term: data = { 'songs': infos_by_term(term)[:10] }
+    return Response(json.dumps(data), mimetype='application/json')
+
+@app.route("/lk", methods=['GET'])
+def get_lk_source():
+    urls = [request.args.get('url')]
+    tmp = [fetch_meta(u) for u in urls]
+    metas = []
+    for s in tmp:
+        metas = metas + groupby(3, s) 
+    data = {
+        'songs': [{
+            'name': title,
+            'link': url
+        } for title, url, duration in metas[:10]]
+    }
     return Response(json.dumps(data), mimetype='application/json')
 
 if __name__ == "__main__":

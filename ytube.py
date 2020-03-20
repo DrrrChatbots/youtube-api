@@ -114,6 +114,23 @@ def urls_by_url(url, classname, retry=True):
     elif retry: urls_by_url(url, classname, False)
     else: raise Exception("No song found by the keyword QwQ")
 
+def infos_by_url(url, classname, retry=True):
+    print("search url is:", url)
+    response = urllib.request.urlopen(url)
+    html = response.read()
+    soup = BeautifulSoup(html, 'html.parser')
+    with open("out.html", 'wb') as w:
+        w.write(html)
+    rtn = [{
+            'name': vid['title'],
+            'link': 'https://www.youtube.com' + vid['href']
+            } for vid in soup.findAll('a', href=True, attrs={'class': classname})
+            if not vid['href'].startswith("https://")]
+    if rtn: return rtn
+    elif retry: urls_by_url(url, classname, False)
+    else: raise Exception("No song found by the keyword QwQ")
+
+
 def url_by_list_id(list_id):
     return 'https://www.youtube.com/playlist?list=' + list_id
 
@@ -124,6 +141,11 @@ def urls_by_term(textToSearch):
     query = urllib.parse.quote(textToSearch)
     url = "https://www.youtube.com/results?search_query=" + query
     return urls_by_url(url, 'yt-uix-tile-link')
+
+def infos_by_term(textToSearch):
+    query = urllib.parse.quote(textToSearch)
+    url = "https://www.youtube.com/results?search_query=" + query
+    return infos_by_url(url, 'yt-uix-tile-link')
 
 def url_by_term(textToSearch):
     return urls_by_term(textToSearch)[0]
@@ -139,13 +161,13 @@ def next_url(url):
 
 if __name__ == '__main__':
     term = sys.argv[1]
-    urls = urls_by_term(term)
+    urls = infos_by_term(term)
     urls = [u for u in urls if 'list' not in u]
-    data = {
-            'songs': [{
-                'name': title,
-                'link': url
-            } for title, url, duration in [fetch_meta(u) for u in urls[:5]]]
-        }
-    print(data)
-
+    #data = {
+    #        'songs': [{
+    #            'name': title,
+    #            'link': url
+    #        } for title, url, duration in [fetch_meta(u) for u in urls[:5]]]
+    #    }
+    #print(data)
+    print(urls)
