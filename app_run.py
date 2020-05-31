@@ -72,7 +72,7 @@ def get_kw_source():
     data = {}
     infos = infos_by_term(term)
     infos = infos[:10] if infos else []
-    if term: data = { 'songs': info }
+    if term: data = { 'songs': infos }
     return Response(json.dumps(data), mimetype='application/json')
 
 @app.route("/lk", methods=['GET'])
