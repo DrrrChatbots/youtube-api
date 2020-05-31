@@ -70,7 +70,9 @@ def get_yt_source():
 def get_kw_source():
     term = request.args.get('term')
     data = {}
-    if term: data = { 'songs': infos_by_term(term)[:10] }
+    infos = infos_by_term(term)
+    infos = infos[:10] if infos else []
+    if term: data = { 'songs': info }
     return Response(json.dumps(data), mimetype='application/json')
 
 @app.route("/lk", methods=['GET'])
