@@ -79,7 +79,7 @@ class Logger(object):
     def error(self, msg):
         pass
 
-#geo_bypass:        
+#geo_bypass:
 #geo_bypass_country:
 #https://github.com/ytdl-org/youtube-dl/blob/3e4cedf9e8cd3157df2457df7274d0c842421945/youtube_dl/YoutubeDL.py#L137-L312
 
@@ -99,7 +99,7 @@ def fetch_meta(url, vid=False):
     if vid: ydl_opts['forceid'] = True
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    
+
     return logger.data
 
 def urls_by_url(url, classname, retry=True):
