@@ -148,7 +148,11 @@ def infos_by_term(textToSearch):
     return infos_by_url(url, 'yt-uix-tile-link')
 
 def url_by_term(textToSearch):
-    return urls_by_term(textToSearch)[0]
+    try:
+        c = urls_by_term(textToSearch)[0]
+        return c
+    except Exception as e:
+        return []
 
 cache_list = []
 def next_url(url):
