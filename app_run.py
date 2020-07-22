@@ -70,7 +70,10 @@ def get_yt_source():
 def get_kw_source():
     term = request.args.get('term')
     data = {}
-    infos = infos_by_term(term)
+    try:
+        infos = infos_by_term(term)
+    except Exception as e:
+        infos = []
     infos = infos[:10] if infos else []
     if term: data = { 'songs': infos }
     return Response(json.dumps(data), mimetype='application/json')
