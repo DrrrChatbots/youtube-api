@@ -54,7 +54,7 @@ def get_yt_source():
             tmp = [fetch_meta(u) for u in urls]
             metas = []
             for s in tmp:
-                metas = metas + groupby(3, s) 
+                metas = metas + groupby(3, s)
             data = {
                 'songs': [{
                     'name': title,
@@ -85,7 +85,7 @@ def get_lk_source():
     tmp = [fetch_meta(u) for u in urls]
     metas = []
     for s in tmp:
-        metas = metas + groupby(3, s) 
+        metas = metas + groupby(3, s)
     data = {
         'songs': [{
             'name': title,

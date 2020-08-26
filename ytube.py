@@ -16,6 +16,7 @@ import asyncio
 import time
 
 import youtube_dl
+from youtube_search import YoutubeSearch
 
 def shorten_url(url):
     data = { "url": url }
@@ -102,33 +103,33 @@ def fetch_meta(url, vid=False):
 
     return logger.data
 
-def urls_by_url(url, classname, retry=True):
-    print("search url is:", url)
-    response = urllib.request.urlopen(url)
-    html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
-    rtn = ['https://www.youtube.com' + vid['href']
-            for vid in soup.findAll('a', href=True, attrs={'class': classname})
-            if not vid['href'].startswith("https://")]
-    if rtn: return rtn
-    elif retry: urls_by_url(url, classname, False)
-    else: raise Exception("No song found by the keyword QwQ")
+#def urls_by_url(url, classname, retry=True):
+#    print("search url is:", url)
+#    response = urllib.request.urlopen(url)
+#    html = response.read()
+#    soup = BeautifulSoup(html, 'html.parser')
+#    rtn = ['https://www.youtube.com' + vid['href']
+#            for vid in soup.findAll('a', href=True, attrs={'class': classname})
+#            if not vid['href'].startswith("https://")]
+#    if rtn: return rtn
+#    elif retry: urls_by_url(url, classname, False)
+#    else: raise Exception("No song found by the keyword QwQ")
 
-def infos_by_url(url, classname, retry=True):
-    print("search url is:", url)
-    response = urllib.request.urlopen(url)
-    html = response.read()
-    soup = BeautifulSoup(html, 'html.parser')
-    with open("out.html", 'wb') as w:
-        w.write(html)
-    rtn = [{
-            'name': vid['title'],
-            'link': 'https://www.youtube.com' + vid['href']
-            } for vid in soup.findAll('a', href=True, attrs={'class': classname})
-            if not vid['href'].startswith("https://")]
-    if rtn: return rtn
-    elif retry: urls_by_url(url, classname, False)
-    else: raise Exception("No song found by the keyword QwQ")
+#def infos_by_url(url, classname, retry=True):
+#    print("search url is:", url)
+#    response = urllib.request.urlopen(url)
+#    html = response.read()
+#    soup = BeautifulSoup(html, 'html.parser')
+#    with open("out.html", 'wb') as w:
+#        w.write(html)
+#    rtn = [{
+#            'name': vid['title'],
+#            'link': 'https://www.youtube.com' + vid['href']
+#            } for vid in soup.findAll('a', href=True, attrs={'class': classname})
+#            if not vid['href'].startswith("https://")]
+#    if rtn: return rtn
+#    elif retry: urls_by_url(url, classname, False)
+#    else: raise Exception("No song found by the keyword QwQ")
 
 
 def url_by_list_id(list_id):
@@ -138,14 +139,12 @@ def url_by_vid(vid):
     return 'https://www.youtube.com/watch?v=' + vid
 
 def urls_by_term(textToSearch):
-    query = urllib.parse.quote(textToSearch)
-    url = "https://www.youtube.com/results?search_query=" + query
-    return urls_by_url(url, 'yt-uix-tile-link')
+    results = YoutubeSearch(textToSearch, max_results=10).to_dict()
+    return ['https://www.youtube.com' + e['url_suffix'] for e in results]
 
 def infos_by_term(textToSearch):
-    query = urllib.parse.quote(textToSearch)
-    url = "https://www.youtube.com/results?search_query=" + query
-    return infos_by_url(url, 'yt-uix-tile-link')
+    results = YoutubeSearch(textToSearch, max_results=10).to_dict()
+    return [{ 'name': e['title'], 'link': 'https://www.youtube.com' + e['url_suffix'] } for e in results]
 
 def url_by_term(textToSearch):
     try:
@@ -156,17 +155,18 @@ def url_by_term(textToSearch):
 
 cache_list = []
 def next_url(url):
-    rtn = urls_by_url(url, 'content-link spf-link yt-uix-sessionlink spf-link')
-    # prevent repeat recommendation
-    while len(rtn) > 1:
-        if rtn[0] not in cache_list: break
-        else: rtn.pop(0)
-    return rtn[0]
+    return None
+    #rtn = urls_by_url(url, 'content-link spf-link yt-uix-sessionlink spf-link')
+    ## prevent repeat recommendation
+    #while len(rtn) > 1:
+    #    if rtn[0] not in cache_list: break
+    #    else: rtn.pop(0)
+    #return rtn[0]
 
 if __name__ == '__main__':
-    term = sys.argv[1]
-    urls = infos_by_term(term)
-    urls = [u for u in urls if 'list' not in u]
+    #term = sys.argv[1]
+    #urls = infos_by_term(term)
+    #urls = [u for u in urls if 'list' not in u]
     #data = {
     #        'songs': [{
     #            'name': title,
@@ -174,4 +174,5 @@ if __name__ == '__main__':
     #        } for title, url, duration in [fetch_meta(u) for u in urls[:5]]]
     #    }
     #print(data)
-    print(urls)
+    #print(urls)
+    print(infos_by_term('沒離開過'))
