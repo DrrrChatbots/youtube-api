@@ -1,6 +1,6 @@
 flask
 gunicorn
 bs4
-youtube_dl==2020.7.28
+youtube_dl==2020.12.2
 Flask-Sockets
 youtube_search==1.1.1
