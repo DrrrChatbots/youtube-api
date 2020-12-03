@@ -3,4 +3,4 @@ gunicorn
 bs4
 youtube_dl==2020.7.28
 Flask-Sockets
-youtube_search=1.1.1
+youtube_search==1.1.1
