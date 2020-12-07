@@ -1,7 +1,5 @@
-import os, sys
 import os.path
-import shlex
-import subprocess
+import re, os, sys, shlex, subprocess
 
 from pprint import pprint
 
@@ -11,21 +9,22 @@ from urllib.parse import urlencode, quote_plus
 
 from bs4 import BeautifulSoup
 
-import html
-import asyncio
-import time
+import html, time, json, asyncio
 
 import youtube_dl
 from youtube_search import YoutubeSearch
+
+DEFAULT_HEADER = {
+        'User-Agent':
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
+}
 
 def shorten_url(url):
     data = { "url": url }
     tinyURL = 'https://tinyurl.com/api-create.php'
     req = request.Request(
             "{}?{}".format(tinyURL,urlencode(data, quote_via=quote_plus)),
-            headers={
-                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.47 Safari/537.36'
-        }) # GET
+            headers=DEFAULT_HEADER) # GET
     try:
         short = request.urlopen(req).read().decode('utf-8')
     except Exception as e:
@@ -138,11 +137,86 @@ def url_by_list_id(list_id):
 def url_by_vid(vid):
     return 'https://www.youtube.com/watch?v=' + vid
 
+def youtube_id_parser(url):
+    """Returns Video_ID extracting from the given url of Youtube
+
+    Examples of URLs:
+      Valid:
+        'http://youtu.be/_lOT2p_FCvA',
+        'www.youtube.com/watch?v=_lOT2p_FCvA&feature=feedu',
+        'http://www.youtube.com/embed/_lOT2p_FCvA',
+        'http://www.youtube.com/v/_lOT2p_FCvA?version=3&amp;hl=en_US',
+        'https://www.youtube.com/watch?v=rTHlyTphWP0&index=6&list=PLjeDyYvG6-40qawYNR4juzvSOg-ezZ2a6',
+        'youtube.com/watch?v=_lOT2p_FCvA',
+
+      Invalid:
+        'youtu.be/watch?v=_lOT2p_FCvA',
+    """
+    try:
+        # python 3
+        from urllib.parse import urlparse, parse_qs
+    except ImportError:
+        # python 2
+        from urlparse import urlparse, parse_qs
+
+    if url.startswith(('youtu', 'www')):
+        url = 'http://' + url
+
+    query = urlparse(url)
+
+    if not query or not query.hostname:
+        return None
+
+    if 'youtube' in query.hostname:
+        if query.path == '/watch':
+            return parse_qs(query.query)['v'][0]
+        elif query.path.startswith(('/embed/', '/v/')):
+            return query.path.split('/')[2]
+    elif 'youtu.be' in query.hostname:
+        return query.path[1:]
+    else:
+        raise ValueError
+
 def urls_by_term(textToSearch):
+
+    yid = youtube_id_parser(textToSearch)
+    if yid:
+        textToSearch = yid
+    else: print('not match')
+
+    if re.search(re.compile(r'[a-zA-Z0-9_-]{11}'), textToSearch):
+        url = 'https://www.youtube.com/watch?v=' + textToSearch
+        req = request.Request(url, headers=DEFAULT_HEADER)
+        if request.urlopen(req).getcode() == 200:
+            return [url]
+
     results = YoutubeSearch(textToSearch, max_results=10).to_dict()
     return ['https://www.youtube.com' + e['url_suffix'] for e in results]
 
+def title_by_vid(vid):
+    url = 'https://youtube.com/get_video_info?video_id=' + vid
+    req = request.Request(url, headers=DEFAULT_HEADER)
+    resp = request.urlopen(req)
+    ret = resp.read().decode('utf-8')
+    ret = parse.parse_qs(ret)
+    print(ret.keys())
+    if 'ok' in ret['status']:
+        data = ret['player_response'][0]
+        return json.loads(data)['videoDetails']['title']
+    elif 'fail' in ret['status']:
+        return None
+
 def infos_by_term(textToSearch):
+
+    vid = youtube_id_parser(textToSearch)
+
+    if vid:
+        textToSearch = vid
+    if re.search(re.compile(r'[a-zA-Z0-9_-]{11}'), textToSearch):
+        title = title_by_vid(textToSearch)
+        url = 'https://www.youtube.com/watch?v=' + textToSearch
+        if title: return [{ 'name': title, 'link': url}]
+
     results = YoutubeSearch(textToSearch, max_results=10).to_dict()
     return [{ 'name': e['title'], 'link': 'https://www.youtube.com' + e['url_suffix'] } for e in results]
 
