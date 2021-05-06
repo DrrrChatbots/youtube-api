@@ -94,7 +94,7 @@ def fetch_meta(url, vid=False):
         #'forcedescription': True,
         #'dump_single_json': True,
         'quiet': True,
-        'format': 'bestaudio/best'
+        'format': 'bestaudio'
     }
     if vid: ydl_opts['forceid'] = True
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
